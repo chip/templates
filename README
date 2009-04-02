@@ -1,0 +1,8 @@
+== Templates for Rails applications
+
+Many Rails applications require tasks such as plugin installation, database setup, repository creation, and many other initial duties. 
+The templates provided here were created in an effort to ease this project initialization pain.
+
+== Author
+
+* Chip Castle (chip@chipcastle.com)
