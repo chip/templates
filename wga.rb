@@ -21,7 +21,7 @@ gem 'haml'
 gem 'mislav-will_paginate', :version => '~> 2.2.3', :lib => 'will_paginate', :source => 'http://gems.github.com'
 
 ##############  commands #################
-generate("authenticated", "user session")
+#generate("authenticated", "user session")
 
 run "touch tmp/.gitignore log/.gitignore vendor/.gitignore"
   run %{find . -type d -empty | grep -v "vendor" | grep -v ".git" | grep -v "tmp" | xargs -I xxx touch xxx/.gitignore}
