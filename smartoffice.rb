@@ -29,7 +29,7 @@ plugin 'active_merchant',             :git => 'git://github.com/Shopify/active_m
 gem 'rubyist-aasm', :version => '~> 2.0.2', :lib => 'aasm', :source => "http://gems.github.com"
 gem "activemerchant", :lib => "active_merchant"
 gem 'newgem', :version => '>= 1.2.3'
-gem 'norman-haml_scaffold', :source => 'http://gems.github.com'
+#gem 'norman-haml_scaffold', :source => 'http://gems.github.com'
 gem 'haml'
 gem 'prawn'
 gem 'populator', :lib => 'populator'

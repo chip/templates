@@ -1,3 +1,16 @@
+# To Do
+#
+# 1. Need static url for template
+# 2. Initialize project with haml
+#    cd ../; haml --rails project
+# script/generate controller front
+# cat "WGA Welcome Page" > project/app/views/front/welcome.html.haml
+# 3. Setup map.root in routes.rb for front controller
+# Setup shared header, footer, default layout
+# 4. Why is norman-haml_scaffold not installing?
+# 5. "ask" before doing initial git commit
+# ubify
+# cp deploy with project details filled in
 
 # Setup a new project
 # rails project -m http://
@@ -16,7 +29,7 @@ plugin 'state_select',                :git => 'git://github.com/sprsquish/state_
 
 ############## gem commands #################
 gem 'newgem', :version => '>= 1.2.3'
-gem 'norman-haml_scaffold', :source => 'http://gems.github.com'
+#gem 'norman-haml_scaffold', :source => 'http://gems.github.com'
 gem 'haml'
 gem 'mislav-will_paginate', :version => '~> 2.2.3', :lib => 'will_paginate', :source => 'http://gems.github.com'
 
@@ -40,3 +53,7 @@ run "rm public/robots.txt"
 git :init
 git :add => "."
 git :commit => "-a -m 'Initial commit'"
+
+# Setup remote github origin
+#  git remote add origin git@github.com:kyle/wga.git
+# push master
