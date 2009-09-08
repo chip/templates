@@ -9,10 +9,12 @@ if automatic || yes?("\nInstall plugins?")
   plugin 'haml',                        :git => "git://github.com/nex3/haml.git"
 end
 
+other_gems = %w(git@github.com:chip/shopping_cart.git activemerchant paperclip simple-captcha hpricot)
+
 if automatic || yes?("\nInstall haml?")
   puts "Setting up haml for #{project}"
   gem 'haml'
-  run "haml --rails summit from /Users/deploy/Sites/#{project}"
+  run "haml --rails #{project} from /Users/deploy/Sites/#{project}"
   rake "gems:install"
 end
 
@@ -48,7 +50,7 @@ CODE
 CODE
 end
 
-if automatic || yes?("\nSetup Ubistrano?")
+if yes?("\nSetup Ubistrano?")
   run "ubify ."
   project_name = project.to_s.downcase
   # cp deploy with project details filled in
@@ -87,6 +89,70 @@ set :use_sudo, true
 
 CODE
 
+else
+  # Setup deploy.rb per Jim Neath's example: http://jimneath.org/2008/05/10/using-capistrano-with-passenger-mod_rails/
+  
+  ip = ask?("\nWhat is the hostname or IP address of your Amazon EC2 server?")
+  file 'config/deploy.rb', <<-CODE
+  #############################################################
+  #	Application
+  #############################################################
+
+  set :application, "#{project}"
+  set :deploy_to, "/var/www/staging/#{application}"
+
+  #############################################################
+  #	Settings
+  #############################################################
+
+  default_run_options[:pty] = true
+  set :use_sudo, true
+
+  #############################################################
+  #	Servers
+  #############################################################
+
+  set :user, "deploy"
+  set :domain, "#{ip}"  # Enter EC2 Instance IP
+  server domain, :app, :web
+  role :db, domain, :primary => true
+
+  #############################################################
+  #	Git repository
+  #############################################################
+
+  set :scm, "git"
+  set :scm_username, "deploy"
+  set :scm_password, "Design01"
+  set :repository,  "git@github.com:kyle/#{project}.git"
+  set :deploy_via, :remote_cache
+
+  #############################################################
+  # Passenger
+  #############################################################
+
+  namespace :passenger do
+    desc "Restart Application"
+    task :restart, :roles => :app do
+      run "touch #{current_path}/tmp/restart.txt"
+    end
+  end
+
+  namespace :db do
+    desc "Symlink database.yml file to shared/system directory"
+    task :symlink, :roles => :app do
+      run "ln -s #{shared_path}/system/database.yml #{current_path}/config/database.yml"
+    end
+  end
+
+  namespace :db do
+    desc "Upload database.yml file to shared/system directory"
+    task :xfer, :roles => :app do
+      upload("./config/database.yml", "#{shared_path}/system/database.yml", :via => :scp)
+    end
+  end
+  after :deploy, "db:symlink", "passenger:restart"
+  CODE
 end
 
 if automatic || yes?("\nSetup lightbox2? (prototype JS compatible)")
@@ -124,13 +190,39 @@ if automatic || yes?("\nDo you want to initialize a git repository")
   git :init
 
   # Setup remote github origin
-  git :remote => "add origin git@github.com:kyle/summit.git"
+  git :remote => "add origin git@github.com:kyle/#{project}.git"
   
   if yes?("\nDo you want to perform the initial commit to github?")
     git :add => "."
-    git :commit => "-a -m 'Initial commit'"
+    git :commit => "-a -m 'Commiting Rails project and plugins'"
+    git :pull => "master"
     git :push => "master"
   end
+end
+
+if automatic || yes?("\nSetup database.yml file?")
+  file 'config/database.yml', <<-END
+  development:
+    :adapter: mysql
+    :host: localhost
+    :username: root
+    :password: 
+    :database: #{project}_development
+
+  test:
+    :adapter: mysql
+    :host: localhost
+    :username: root
+    :password: 
+    :database: #{project}_test  
+
+  production:
+    :adapter: mysql
+    :host: localhost
+    :username: root
+    :password: 
+    :database: #{project}
+  END
 end
 
 if automatic || yes?("\nDisplay apache config for #{project} ?")
